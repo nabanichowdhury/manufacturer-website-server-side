@@ -115,7 +115,7 @@ async function run() {
         const purchase = await purchaseCollection.find(query).toArray();
         res.send(purchase);
       } else {
-        return res.status(403).send({ message: "Forbidden access" });
+        return res.status(403).send({ message: "Forbidden " });
       }
     });
     app.post("/purchase", async (req, res) => {
