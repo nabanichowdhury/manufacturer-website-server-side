@@ -137,7 +137,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Manufacturer website data");
+  res.send("Manufacturer website");
 });
 
 app.listen(port, () => {
