@@ -26,7 +26,7 @@ function verifyJWT(req, res, next) {
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
     if (err) {
-      return res.status(403).send({ message: "Forbidden Access" });
+      return res.status(403).send({ message: " Forbidden" });
     }
     req.decoded = decoded;
     next();
@@ -91,6 +91,13 @@ async function run() {
     app.get("/user", verifyJWT, async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
+    });
+    app.delete("/users/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+
+      const result = await userCollection.deleteOne(filter);
+      res.send(result);
     });
 
     app.get("/part/:id", async (req, res) => {
