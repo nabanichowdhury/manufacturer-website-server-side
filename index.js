@@ -41,6 +41,8 @@ async function run() {
       .collection("purchase");
     const userCollection = client.db("manufacturer_data").collection("users");
 
+    console.log("all route should work ");
+
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
       const requesterAccount = await userCollection.findOne({
@@ -97,6 +99,12 @@ async function run() {
       const result = await partsCollection.insertOne(part);
       res.send(result);
     });
+    app.get("/part/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const part = await partsCollection.find(query).toArray();
+      res.send(part);
+    });
     app.delete("/parts/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
@@ -114,13 +122,6 @@ async function run() {
 
       const result = await userCollection.deleteOne(filter);
       res.send(result);
-    });
-
-    app.get("/part/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const part = await partsCollection.find(query).toArray();
-      res.send(part);
     });
 
     app.get("/purchase", verifyJWT, async (req, res) => {
