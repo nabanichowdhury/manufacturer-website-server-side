@@ -41,7 +41,7 @@ async function run() {
       .collection("purchase");
     const userCollection = client.db("manufacturer_data").collection("users");
 
-    console.log("all route should work ");
+    console.log("all route should work perfectly in heroku");
 
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
