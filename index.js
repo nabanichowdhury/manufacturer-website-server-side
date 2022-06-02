@@ -41,22 +41,27 @@ async function run() {
       .collection("purchase");
     const userCollection = client.db("manufacturer_data").collection("users");
 
-    app.put("/user/admin/:email", verifyJWT, async (req, res) => {
-      const email = req.params.email;
+    const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
       const requesterAccount = await userCollection.findOne({
         email: requester,
       });
       if (requesterAccount.role === "admin") {
-        const filter = { email: email };
-        const updateDoc = {
-          $set: { role: "admin" },
-        };
-        const result = await userCollection.updateOne(filter, updateDoc);
-        res.send({ result });
+        next();
       } else {
         res.status(403).send({ message: "Forbidden" });
       }
+    };
+
+    app.put("/user/admin/:email", verifyJWT, verifyAdmin, async (req, res) => {
+      const email = req.params.email;
+
+      const filter = { email: email };
+      const updateDoc = {
+        $set: { role: "admin" },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send({ result });
     });
 
     app.get("/admin/:email", async (req, res) => {
@@ -87,12 +92,23 @@ async function run() {
       const parts = await partsCollection.find().toArray();
       res.send(parts);
     });
+    app.post("/parts", verifyJWT, verifyAdmin, async (req, res) => {
+      const part = req.body;
+      const result = await partsCollection.insertOne(part);
+      res.send(result);
+    });
+    app.delete("/parts/:id", verifyJWT, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await partsCollection.deleteOne(filter);
+      res.send(result);
+    });
 
     app.get("/user", verifyJWT, async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
-    app.delete("/users/:email", verifyJWT, async (req, res) => {
+    app.delete("/user/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
 
